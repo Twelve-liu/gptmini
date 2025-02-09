@@ -1,9 +1,9 @@
 import streamlit as st
 from langchain.memory import ConversationBufferMemory
 
-from utils import get_chat_response
+from utils import get_response
 
-st.title("💬 克隆ChatGPT")
+st.title("GPTmini")
 
 with st.sidebar:
     openai_api_key = st.text_input("请输入OpenAI API Key：", type="password")
@@ -17,17 +17,16 @@ if "memory" not in st.session_state:
 for message in st.session_state["messages"]:
     st.chat_message(message["role"]).write(message["content"])
 
-prompt = st.chat_input()
-if prompt:
+human_input = st.chat_input()
+if human_input:
     if not openai_api_key:
-        st.info("请输入你的OpenAI API Key")
+        st.write("请输入OpenAI API Key")
         st.stop()
-    st.session_state["messages"].append({"role": "human", "content": prompt})
-    st.chat_message("human").write(prompt)
+    st.session_state["messages"].append({"role": "human", "content": human_input})
+    st.chat_message("human").write(human_input)
 
     with st.spinner("AI正在思考中，请稍等..."):
-        response = get_chat_response(prompt, st.session_state["memory"],
-                                     openai_api_key)
+        response = get_response(human_input, st.session_state["memory"], openai_api_key)
     msg = {"role": "ai", "content": response}
     st.session_state["messages"].append(msg)
     st.chat_message("ai").write(response)
